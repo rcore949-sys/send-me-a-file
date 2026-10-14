@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hi Johnson</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  --bg1:#2a0509; --bg2:#5c0a14; --red:#ff3b4e; --red-deep:#c8102e;
+  --glass:rgba(255,255,255,.09); --glass-edge:rgba(255,255,255,.28);
+  --text:#fff4f4; --muted:rgba(255,235,235,.7);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{min-height:100%;margin:0}
+body{
+  font-family:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color:var(--text);
+  background:linear-gradient(160deg,var(--bg1),var(--bg2) 60%,#8a0f1f);
+  background-attachment:fixed;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 16px;position:relative;overflow-x:hidden;
+}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.7;z-index:0;pointer-events:none}
+.o1{width:340px;height:340px;background:var(--red);top:-80px;left:-90px}
+.o2{width:300px;height:300px;background:#ff7a5c;bottom:-70px;right:-80px;opacity:.5}
+.o3{width:220px;height:220px;background:var(--red-deep);top:45%;left:55%}
+.card{
+  position:relative;z-index:1;width:100%;max-width:460px;
+  background:var(--glass);
+  border:1px solid var(--glass-edge);
+  border-radius:28px;padding:30px 26px;
+  backdrop-filter:blur(26px) saturate(160%);-webkit-backdrop-filter:blur(26px) saturate(160%);
+  box-shadow:0 24px 60px rgba(40,0,6,.5), inset 0 1px 0 rgba(255,255,255,.35);
+}
+h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.sub{margin:0 0 22px;color:var(--muted);font-size:15px;line-height:1.5}
+label.field{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--muted)}
+input[type=text]{
+  width:100%;padding:13px 15px;border-radius:14px;font:inherit;color:var(--text);
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);outline:none;margin-bottom:16px;
+}
+input[type=text]::placeholder{color:rgba(255,235,235,.45)}
+input[type=text]:focus-visible,.drop:focus-visible,button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.drop{
+  display:block;text-align:center;padding:30px 16px;border-radius:20px;cursor:pointer;
+  border:1.5px dashed rgba(255,255,255,.4);background:rgba(255,255,255,.05);
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.drop.over{background:rgba(255,59,78,.22);border-color:#fff;transform:scale(1.015)}
+.drop strong{display:block;font-size:17px;margin-bottom:4px}
+.drop span{font-size:13px;color:var(--muted)}
+.row{display:flex;gap:10px;margin-top:12px}
+.row button{
+  flex:1;padding:12px;border-radius:14px;font:inherit;font-weight:700;color:var(--text);cursor:pointer;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);
+}
+.row button:hover{background:rgba(255,255,255,.18)}
+.picked{margin-top:16px;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.2);font-size:14px;display:none}
+.picked b{display:block;word-break:break-all}
+.picked small{color:var(--muted)}
+.go{
+  width:100%;margin-top:18px;padding:15px;border:0;border-radius:16px;font:inherit;font-size:16px;font-weight:800;
+  color:#fff;cursor:pointer;background:linear-gradient(135deg,#ff4d5e,var(--red-deep));
+  box-shadow:0 10px 26px rgba(255,59,78,.4), inset 0 1px 0 rgba(255,255,255,.4);
+}
+.go:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.12);margin-top:16px;overflow:hidden;display:none}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff8a8f,#fff);border-radius:99px;transition:width .15s}
+.msg{margin-top:14px;font-size:14px;min-height:20px;text-align:center}
+.msg.ok{color:#c9ffd9;font-weight:700}.msg.err{color:#ffd0d0;font-weight:700}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+
+<main class="card">
+  <h1>Hi Johnson</h1>
+  <p class="sub">Send me the file now. A file, a zip, or a whole folder works.</p>
+
+  <label class="field" for="name">Your name</label>
+  <input type="text" id="name" placeholder="So I know who sent it" maxlength="40" autocomplete="name">
+
+  <label class="drop" id="drop" tabindex="0" for="fileIn">
+    <strong>Tap to choose files</strong>
+    <span>or drop files and folders here</span>
+  </label>
+  <input type="file" id="fileIn" multiple hidden>
+  <input type="file" id="dirIn" webkitdirectory hidden>
+
+  <div class="row">
+    <button type="button" id="pickFiles">Files or zip</button>
+    <button type="button" id="pickDir">Folder</button>
+  </div>
+
+  <div class="picked" id="picked"><b id="pName"></b><small id="pInfo"></small></div>
+  <div class="bar" id="bar"><i id="fill"></i></div>
+  <button class="go" id="go" disabled>Send file</button>
+  <div class="msg" id="msg" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+/* ====== SET THESE 3 VALUES ====== */
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY";
+const BUCKET = "drop";
+/* ================================= */
+
+const $ = id => document.getElementById(id);
+let items = [];          // [{file, path}]
+let label = "";
+
+const fmt = n => n < 1024 ? n+" B" : n < 1048576 ? (n/1024).toFixed(1)+" KB" : (n/1048576).toFixed(1)+" MB";
+const clean = s => s.replace(/[^\w.\-]+/g,"_").slice(0,80) || "file";
+
+function setItems(list, text){
+  items = list;
+  if(!items.length){ $("picked").style.display="none"; $("go").disabled=true; return; }
+  const total = items.reduce((a,x)=>a+x.file.size,0);
+  const single = items.length === 1 && !items[0].path.includes("/");
+  label = single ? items[0].file.name : (text || (items.length+" files"));
+  $("pName").textContent = label;
+  $("pInfo").textContent = (single ? "" : items.length+" files, will be zipped. ") + fmt(total);
+  $("picked").style.display = "block";
+  $("go").disabled = false; $("msg").textContent=""; $("msg").className="msg";
+}
+
+$("pickFiles").onclick = () => $("fileIn").click();
+$("pickDir").onclick = () => $("dirIn").click();
+$("fileIn").onchange = e => setItems([...e.target.files].map(f=>({file:f,path:f.name})));
+$("dirIn").onchange = e => {
+  const fs = [...e.target.files];
+  const root = fs[0]?.webkitRelativePath.split("/")[0] || "folder";
+  setItems(fs.map(f=>({file:f,path:f.webkitRelativePath})), "Folder: "+root);
+};
+
+/* drag and drop, including folders */
+const drop = $("drop");
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop", async e => {
+  const entries = [...e.dataTransfer.items].map(i=>i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+  const out = [];
+  const walk = async (en, base) => {
+    if(en.isFile){ const f = await new Promise(r=>en.file(r)); out.push({file:f,path:base+en.name}); }
+    else {
+      const rd = en.createReader(); let batch;
+      do { batch = await new Promise(r=>rd.readEntries(r)); for(const c of batch) await walk(c, base+en.name+"/"); } while(batch.length);
+    }
+  };
+  for(const en of entries) await walk(en,"");
+  const dirs = entries.filter(x=>x.isDirectory);
+  setItems(out, dirs.length===1 && entries.length===1 ? "Folder: "+dirs[0].name : null);
+});
+
+function send(){
+  const msg = $("msg"), bar = $("bar"), fill = $("fill"), go = $("go");
+  go.disabled = true; msg.className="msg"; msg.textContent="Preparing…"; bar.style.display="block"; fill.style.width="0";
+  (async () => {
+    let blob, fname;
+    const single = items.length === 1 && !items[0].path.includes("/");
+    if(single){ blob = items[0].file; fname = items[0].file.name; }
+    else {
+      const zip = new JSZip();
+      items.forEach(x=>zip.file(x.path, x.file));
+      msg.textContent = "Zipping…";
+      blob = await zip.generateAsync({type:"blob",compression:"DEFLATE"},m=>{fill.style.width=(m.percent*0.3)+"%"});
+      const base = label.startsWith("Folder: ") ? label.slice(8) : "files";
+      fname = clean(base)+".zip";
+    }
+    const who = clean($("name").value.trim() || "friend");
+    const path = Date.now()+"_"+who+"_"+clean(fname);
+    const start = single ? 0 : 30;
+    msg.textContent = "Sending…";
+    await new Promise((res,rej)=>{
+      const x = new XMLHttpRequest();
+      x.open("POST", `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(path)}`);
+      x.setRequestHeader("apikey", SUPABASE_ANON_KEY);
+      x.setRequestHeader("Authorization","Bearer "+SUPABASE_ANON_KEY);
+      x.setRequestHeader("Content-Type", blob.type || "application/octet-stream");
+      x.upload.onprogress = e => { if(e.lengthComputable) fill.style.width = (start+(100-start)*e.loaded/e.total)+"%"; };
+      x.onload = () => x.status<300 ? res() : rej(new Error(x.status===413?"File is too large for the limit.":"Upload was refused ("+x.status+")."));
+      x.onerror = () => rej(new Error("No connection. Check your internet and try again."));
+      x.send(blob);
+    });
+    fill.style.width="100%"; msg.className="msg ok"; msg.textContent="Sent. Thank you!";
+    setItems([]);
+  })().catch(err=>{ msg.className="msg err"; msg.textContent=err.message; go.disabled=false; bar.style.display="none"; });
+}
+$("go").onclick = send;
+</script>
+</body>
+</html>
